@@ -4,7 +4,7 @@
 #
 Name     : flake8-blind-except
 Version  : 0.1.1
-Release  : 1
+Release  : 2
 URL      : https://files.pythonhosted.org/packages/ff/f2/ab635e6e420e78c94eab50cd3f53abd3ec27e411793e50b14f29edbb9f0b/flake8-blind-except-0.1.1.tar.gz
 Source0  : https://files.pythonhosted.org/packages/ff/f2/ab635e6e420e78c94eab50cd3f53abd3ec27e411793e50b14f29edbb9f0b/flake8-blind-except-0.1.1.tar.gz
 Summary  : A flake8 extension that checks for blind except: statements
@@ -45,7 +45,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1532978978
+export SOURCE_DATE_EPOCH=1532979878
 python3 setup.py build -b py3
 
 %install
