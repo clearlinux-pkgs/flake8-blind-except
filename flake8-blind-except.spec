@@ -4,25 +4,93 @@
 #
 Name     : flake8-blind-except
 Version  : 0.1.1
-Release  : 9
+Release  : 10
 URL      : https://files.pythonhosted.org/packages/ff/f2/ab635e6e420e78c94eab50cd3f53abd3ec27e411793e50b14f29edbb9f0b/flake8-blind-except-0.1.1.tar.gz
 Source0  : https://files.pythonhosted.org/packages/ff/f2/ab635e6e420e78c94eab50cd3f53abd3ec27e411793e50b14f29edbb9f0b/flake8-blind-except-0.1.1.tar.gz
 Summary  : A flake8 extension that checks for blind except: statements
 Group    : Development/Tools
 License  : MIT
-Requires: flake8-blind-except-python3
-Requires: flake8-blind-except-python
+Requires: flake8-blind-except-python = %{version}-%{release}
+Requires: flake8-blind-except-python3 = %{version}-%{release}
 Requires: setuptools
 BuildRequires : buildreq-distutils3
 BuildRequires : setuptools
 
 %description
+flake8-blind-except
 ===================
+
+A flake8 extension that checks for blind, catch-all ``except:`` statements.
+
+Using ``except`` without explicitly specifying which exceptions to catch is generally considered bad practice, since it catches system signals like ``SIGINT``. You probably want to handle system interrupts differently than exceptions occuring in your code.
+
+It's also usually better style to have many small ``try``-``except`` blocks catching specific exceptions instead of a giant ``try:`` block with a catch-all ``except:`` at the bottom. It's also nicer to your fellow programmers to be a bit more specific about what exceptions they can expect in specific parts of the code, and what the proper course of action is when they occur.
+
+An example of code that will fail this check is:
+
+.. code-block:: python
+
+    try:
+        something_scary()
+    except:
+        everybody_panic()
+
+However, the following code is valid:
+
+.. code-block:: python
+
+    try:
+        something_terrifying()
+    except TerrifyingException:
+        dont_panic()
+
+Installation
+------------
+
+If you don't already have it, install ``flake8``::
+
+    $ pip install flake8
+
+Then, install the extension::
+
+    $ pip install flake8-blind-except
+
+Usage
+-----
+
+Run the following to verify that the plugin has been installed correctly::
+
+    $ flake8 --version
+    2.0 (pep8: 1.4.6, flake8-blind-except: 0.1.0, pyflakes: 0.7.3)
+
+Now, when you run ``flake8``, the plugin will automatically be used.
+
+When a blind except is found, ``flake8`` will output::
+
+    B901 blind except: statement
+
+
+
+Changes
+------
+
+0.1.1 - 2016-06-27
+``````````````````
+* ``pep8`` was renamed to ``pycodestyle`` in its 2.0 release. Compatibility update for this change
+
+0.1.0 - 2014-02-07
+``````````````````
+* Initial release
+
+Notes
+-----
+
+I've tested this package with flake8 2.6.2 and Python 2.7.3. It is untested (but likely compatible) with other software versions.
 
 %package python
 Summary: python components for the flake8-blind-except package.
 Group: Default
-Requires: flake8-blind-except-python3
+Requires: flake8-blind-except-python3 = %{version}-%{release}
 
 %description python
 python components for the flake8-blind-except package.
@@ -32,6 +100,7 @@ python components for the flake8-blind-except package.
 Summary: python3 components for the flake8-blind-except package.
 Group: Default
 Requires: python3-core
+Provides: pypi(flake8-blind-except)
 
 %description python3
 python3 components for the flake8-blind-except package.
@@ -39,18 +108,27 @@ python3 components for the flake8-blind-except package.
 
 %prep
 %setup -q -n flake8-blind-except-0.1.1
+cd %{_builddir}/flake8-blind-except-0.1.1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1533001771
-python3 setup.py build -b py3
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1582923473
+# -Werror is for werrorists
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$CFLAGS -fno-lto "
+export FFLAGS="$CFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
+export MAKEFLAGS=%{?_smp_mflags}
+python3 setup.py build
 
 %install
+export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
-python3 -tt setup.py build -b py3 install --root=%{buildroot}
+python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
 echo ----[ mark ]----
